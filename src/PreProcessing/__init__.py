@@ -18,98 +18,28 @@ def PreProcessing(img):
     #hàm trên sẽ lưu các đường biên( vector của các điểm) ở array contours, hierachy lưu giá trị đường viền
 
     ## only draw contour that have big areas
-    imx = img.shape[0]
-    imy = img.shape[1]
-    lp_area = (imx * imy) / 10# tìm area có giá trị =1/10  ảnh
+    w = img.shape[0]
+    h = img.shape[1]
+    min_area = (w * h) / 10 # tìm area có giá trị =1/10  ảnh
 
-
-
-
-    ## Get only rectangles given exceeding area
     for cnt in contours:
         approx = cv2.approxPolyDP(cnt,0.01 * cv2.arcLength(cnt, True), True)
-        ## calculate number of vertices
         print(len(approx))
-
-        if len(approx) == 4 and cv2.contourArea(cnt) > lp_area:
-            tmp_img = img.copy()
-            cv2.drawContours(tmp_img, [cnt], 0, (0, 255, 255), 6)
-            cv2.imshow('Contour Borders', tmp_img)
-            cv2.waitKey(0)
-
-            tmp_img = img.copy()
-            cv2.drawContours(tmp_img, [cnt], 0, (255, 0, 255), -1)
-            # cv2.imshow('Contour Filled', tmp_img)
-            cv2.waitKey(0)
+        if len(approx) == 4 and cv2.contourArea(cnt) > min_area:
 
 
-            # Make a hull arround the contour and draw it on the original image
-            tmp_img = img.copy()
-            mask = np.zeros((img.shape[:2]), np.uint8)
-            hull = cv2.convexHull(cnt)
-            cv2.drawContours(mask, [hull], 0, (255, 255, 255), -1)
-            # cv2.imshow('Convex Hull Mask', mask)
-            cv2.waitKey(0)
-
-
-            # Draw minimum area rectangle
-            tmp_img = img.copy()
-            rect = cv2.minAreaRect(cnt)
-            box = cv2.boxPoints(rect)
-            box = np.int0(box)
-            cv2.drawContours(tmp_img, [box], 0, (0, 0, 255), 2)
-            # cv2.imshow('Minimum Area Rectangle', tmp_img)
-            cv2.waitKey(0)
-
-
-            # Draw bounding rectangle
-            tmp_img = img.copy()
-            x, y, w, h = cv2.boundingRect(cnt)
-            cv2.rectangle(tmp_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            # cv2.imshow('Bounding Rectangle', tmp_img)
-            cv2.waitKey(0)
-
-
-            # Bounding Rectangle and Minimum Area Rectangle
-            tmp_img = img.copy()
-            rect = cv2.minAreaRect(cnt)
-            box = cv2.boxPoints(rect)
-            box = np.int0(box)
-            cv2.drawContours(tmp_img, [box], 0, (0, 0, 255), 2)
-            x, y, w, h = cv2.boundingRect(cnt)
-            cv2.rectangle(tmp_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            cv2.imshow('Bounding Rectangle', tmp_img)
-            cv2.waitKey(0)
-
-
-            # determine the most extreme points along the contour
-            # https://www.pyimagesearch.com/2016/04/11/finding-extreme-points-in-contours-with-opencv/
-            tmp_img = img.copy()
             extLeft = tuple(cnt[cnt[:, :, 0].argmin()][0])
             extRight = tuple(cnt[cnt[:, :, 0].argmax()][0])
             extTop = tuple(cnt[cnt[:, :, 1].argmin()][0])
             extBot = tuple(cnt[cnt[:, :, 1].argmax()][0])
-            cv2.drawContours(tmp_img, [cnt], -1, (0, 255, 255), 2)
-            cv2.circle(tmp_img, extLeft, 8, (0, 0, 255), -1)
-            cv2.circle(tmp_img, extRight, 8, (0, 255, 0), -1)
-            cv2.circle(tmp_img, extTop, 8, (255, 0, 0), -1)
-            cv2.circle(tmp_img, extBot, 8, (255, 255, 0), -1)
 
 
-            print("Corner Points: ", extLeft, extRight, extTop, extBot)
-
-
-            cv2.imshow('img contour drawn', tmp_img)
-            cv2.waitKey(0)
-            #cv2.destroyAllWindows()
-
-
-
-            ## Perspective Transform
             tmp_img = img.copy()
             pts = np.array([extLeft, extRight, extTop, extBot])
             warped = four_point_transform(tmp_img, pts)
             img=correct_orientation(warped)
+
+
             path=r'C:\Users\nhatn\PycharmProjects\KTLTPython\image_result'
             cv2.imshow("Original", img)
             cv2.imwrite(os.path.join(path , 'Original.jpg'), img)
@@ -121,28 +51,21 @@ def PreProcessing(img):
             cv2.imshow("After", img)
             cv2.imwrite(os.path.join(path,'After.jpg'), img)
             cv2.waitKey(0)
+
+
     cv2.destroyAllWindows()
 def order_points(pts):
-    # initialzie a list of coordinates that will be ordered
-    # such that the first entry in the list is the top-left,
-    # the second entry is the top-right, the third is the
-    # bottom-right, and the fourth is the bottom-left
     rect = np.zeros((4, 2), dtype="float32")
-
-
-    # print(rect)
-    # the top-left point will have the smallest sum, whereas
-    # the bottom-right point will have the largest sum
     s = pts.sum(axis=1)
+
     rect[0] = pts[np.argmin(s)]
     rect[2] = pts[np.argmax(s)]
-    # now, compute the difference between the points, the
-    # top-right point will have the smallest difference,
-    # whereas the bottom-left will have the largest difference
+
     diff = np.diff(pts, axis=1)
+
     rect[1] = pts[np.argmin(diff)]
     rect[3] = pts[np.argmax(diff)]
-    # return the ordered coordinates
+
     return rect
 
 
@@ -180,10 +103,7 @@ def four_point_transform(image, pts):
     return warped
 
 
-#################################################################
 def correct_orientation(img):
-
-
     h, w, c = img.shape
     if (w < h):
         img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
