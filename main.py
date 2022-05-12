@@ -3,12 +3,12 @@ import pytesseract
 from src.PreProcessing import PreProcessing
 import pandas as pd
 import numpy as np
-img = cv2.imread(r'C:\Users\nhatn\PycharmProjects\KTLTPython\image_test\test_(42).jpg', 1)
+img = cv2.imread(r'\image_test\test_(42).jpg', 1)
 PreProcessing(img)
-img = cv2.imread(r"C:\Users\nhatn\PycharmProjects\KTLTPython\image_result\After.jpg",1)
+img = cv2.imread(r"\image_result\After.jpg",1)
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-img = cv2.imread(r"C:\Users\nhatn\PycharmProjects\KTLTPython\image_result\Original.jpg",1)
-img_ocr = cv2.imread(r"C:\Users\nhatn\PycharmProjects\KTLTPython\image_result\After.jpg",0)
+img = cv2.imread(r"\image_result\Original.jpg",1)
+img_ocr = cv2.imread(r"\image_result\After.jpg",0)
 img_ava = img.copy()
 
 
