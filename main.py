@@ -1,11 +1,9 @@
 import cv2
 import pytesseract
 from src.PreProcessing import PreProcessing
-import pandas as pd
-import numpy as np
+
 img = cv2.imread(r'C:\Users\nhatn\PycharmProjects\KTLTPython\image_test\test_(19).jpg ', 1)
-# cv2.imshow("fw",img)
-# cv2.waitKey()
+
 PreProcessing(img)
 img = cv2.imread(r"C:\Users\nhatn\PycharmProjects\KTLTPython\image_result\After.jpg",1)
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
@@ -45,8 +43,5 @@ custom_config = r'--psm  6 --oem 3 -c tessedit_char_whitelist=0123456789' # numb
 mssv = pytesseract.image_to_string(mssv_ocr, lang='vie', config=custom_config)
 print(mssv)
 
-custom_config = r'--oem 3 --psm 6'
-name = pytesseract.image_to_string(img, lang='vie', config=custom_config)
-print(name)
 
 cv2.waitKey()
