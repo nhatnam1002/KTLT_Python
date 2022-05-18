@@ -62,12 +62,18 @@ def order_points(pts):
 
     rect[0] = pts[np.argmin(s)]
     rect[2] = pts[np.argmax(s)]
-
+    # t = 1;
+    # for i in (pts):
+    #     print("a=", np.float32(i), "rect[0]", rect[0], "rect[2]", rect[2])
+    #     if not (np.array_equal(np.float32(i), rect[0]) or np.array_equal(np.float32(i), rect[2])):
+    #         print("i=", i)
+    #         rect[t] = np.float32(i)
+    #         print()
+    #         t = t + 2
+    # print("rect", rect)
     diff = np.diff(pts, axis=1)
-
     rect[1] = pts[np.argmin(diff)]
     rect[3] = pts[np.argmax(diff)]
-
     return rect
 
 
@@ -107,7 +113,6 @@ def correct_orientation(img):
     img = cv2.resize(img, [480, 280])
 
     if np.sum(summed[0:240]) > np.sum(summed[w - 240:w - 0]):
-        # chia đôi hình tính tổng pixel, phần lớn hơn là phần bên phải
         img = cv2.rotate(img, cv2.ROTATE_180)
 
     return img
